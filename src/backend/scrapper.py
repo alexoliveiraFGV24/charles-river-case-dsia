@@ -2,16 +2,13 @@ from bs4 import BeautifulSoup
 import requests
 import time
 from dotenv import load_dotenv
+import numpy as np
 
-from src.utils import parse_numero, parse_data
-from src.backend.llm_synthesizer import generate_ai_resume
+from src.utils import *
+from src.backend.llm_synthesizer import *
+
 
 load_dotenv()
-
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-}
 
 
 # Dados cadastrais usando o site Status Invest, Investidor 10 e um resumo usando Gemini
@@ -19,18 +16,18 @@ def get_cadastro_data(ticker, max_tries, sleep):
     
     # URLs usadas
     url_status = f"https://statusinvest.com.br/acoes/{ticker.lower()}"
-    url_investidor_10 = f"https://investidor10.com.br/acoes/asai3/{ticker.lower()}"
+    url_investidor_10 = f"https://investidor10.com.br/acoes/{ticker.lower()}"
 
     # Verificações básicas de conexão
     for i in range(max_tries):
         print(f"Tentativa {i+1}")
-        response1 = requests.get(url_status, headers=HEADERS)
-        response2 = requests.get(url_investidor_10, headers=HEADERS)
+        response1 = requests.get(url_status)
+        response2 = requests.get(url_investidor_10)
         if response1.status_code != 200 or response2.status_code != 200:
-            print("Não conseguimos acessar a Status Invest ou a B3. Verifique o nome do ticker ou a conexão")
+            print(f"Não conseguimos acessar a Status Invest ou a Investidor 10. Verifique o nome do ticker ou a conexão. Status: {response1.status_code} e {response2.status_code}")
             time.sleep(sleep)
             if i == max_tries - 1:
-                raise ConnectionError("Não conseguimos conectar")
+                return None
         else:
             print("Conexão garantida")
             break
@@ -76,9 +73,9 @@ def get_cadastro_data(ticker, max_tries, sleep):
 
     if resumo_negocio:
         resumo_negocio = resumo_negocio.text.strip()
-        data["Resumo do negócio"] = generate_ai_resume(ticker, resumo_negocio) # Resumo com AI
+        data["Resumo do negócio (IA)"] = generate_ai_resume(ticker, resumo_negocio) # Resumo com AI
     else:
-        data["Resumo do negócio"] = nao_encontrado
+        data["Resumo do negócio (IA)"] = nao_encontrado
 
     # Retornando
     return data
@@ -94,9 +91,9 @@ def get_cotacao_data(ticker, max_tries, sleep):
     # Verificações bássicas de conexão
     for i in range(max_tries):
         print(f"Tentativa {i+1}")
-        response = requests.get(url_fundamentus, headers=HEADERS)
+        response = requests.get(url_fundamentus)
         if response.status_code != 200:
-            print("Não conseguimos acessar a Fundamentus. Verifique o nome do ticker ou a conexão")
+            print(f"Não conseguimos acessar a Fundamentus. Verifique o nome do ticker ou a conexão. Status: {response.status_code}")
             time.sleep(sleep)
             if i == max_tries - 1:
                 return None
@@ -110,8 +107,7 @@ def get_cotacao_data(ticker, max_tries, sleep):
     # Dados
     data = {}
 
-    # Fiz essa separação pois há duas tabelas com os dados
-    # de cotação no site Fundamentos
+    # Fiz essa separação pois há duas tabelas com os dados de cotação no site Fundamentos
     dados_cotacao = soup_fundamentus.find_all("table", class_="w728")
     dados_cotacao1 = dados_cotacao[0].find_all("span", class_="txt")
     dados_cotacao2 = dados_cotacao[1].find_all("span", class_="txt")
@@ -190,9 +186,9 @@ def get_fundamentalista_data(ticker, max_tries, sleep):
     # Verificações bássicas de conexão
     for i in range(max_tries):
         print(f"Tentativa {i+1}")
-        response = requests.get(url_investidor, headers=HEADERS)
+        response = requests.get(url_investidor)
         if response.status_code != 200:
-            print("Não conseguimos acessar a Fundamentus. Verifique o nome do ticker ou a conexão")
+            print(f"Não conseguimos acessar a Fundamentus. Verifique o nome do ticker ou a conexão. Status: {response.status_code}")
             time.sleep(sleep)
             if i == max_tries - 1:
                 return None
@@ -210,10 +206,10 @@ def get_fundamentalista_data(ticker, max_tries, sleep):
 
     # Indicadores fundamentalistas
     p_por_l = indicadores_fundamentalistas[0].text.strip()
+    dividend_yield = indicadores_fundamentalistas[3].text.strip()
+    margem_liquida = indicadores_fundamentalistas[5].text.strip()
     roe = indicadores_fundamentalistas[19].text.strip()
     divida_liquida_por_ebitda = indicadores_fundamentalistas[23].text.strip()
-    margem_liquida = indicadores_fundamentalistas[5].text.strip()
-    dividend_yield = indicadores_fundamentalistas[3].text.strip()
 
     # Frase de não encontrado
     nao_encontrado = "Não encontrado(a)"
@@ -249,18 +245,18 @@ def get_fundamentalista_data(ticker, max_tries, sleep):
 
 
 
-# Notícias com a Trading View
+# Notícias com a API Trading View e resumo com IA
 def get_noticias_data(ticker, max_tries, sleep):
 
     # URL usada
-    url_trading = f"https://br.tradingview.com/symbols/BMFBOVESPA-{ticker.upper()}"
+    url_trading = f"https://news-mediator.tradingview.com/public/view/v1/symbol?filter=lang%3Apt&filter=symbol%3ABMFBOVESPA%3A{ticker.upper()}&client=landing&streaming=false&user_prostatus=non_pr"
 
     # Verificações bássicas de conexão
     for i in range(max_tries):
         print(f"Tentativa {i+1}")
-        response = requests.get(url_trading, headers=HEADERS)
+        response = requests.get(url_trading)
         if response.status_code != 200:
-            print("Não conseguimos acessar o Trading View. Verifique o nome do ticker ou a conexão")
+            print(f"Não conseguimos acessar a API de notícias do Trading View. Verifique o nome do ticker ou a conexão. Status: {response.status_code}")
             time.sleep(sleep)
             if i == max_tries - 1:
                 return None
@@ -268,16 +264,23 @@ def get_noticias_data(ticker, max_tries, sleep):
             print("Conexão garantida")
             break
     
-    # Criando a instância para o web scrapping
-    soup_trading = BeautifulSoup(response.text, "html.parser")
-
-    todas_noticias = soup_trading.find("div", class_="grid-psYqC5VC")
-    print(todas_noticias.find_all("a"))
+    # Resposta do json
+    todas_noticias = response.json()["items"]
 
     # Dados
     data = {}
 
-    # Pegando as 5 primeiras notícias e classificando a notícia com LLM
+    # Pegando 5 notícias
+    noticias = np.random.choice(todas_noticias, size=5)
+
+    # Fazendo um resumo e classificando cada uma delas
+    for i in range(1):
+        if noticias[i]["storyPath"]:
+            url_noticia = "https://br.tradingview.com" + todas_noticias[i]["storyPath"]
+            resumo, classificador = generate_ai_news_report(ticker, url_noticia)
+            data[f"Notícia {i+1}"] = (url_noticia, resumo, classificador)
+        else:
+            data[f"Notícia {i+1}"] = "Não encontrado(a)"
 
     # Retornando
     return data
@@ -287,18 +290,19 @@ def get_noticias_data(ticker, max_tries, sleep):
 def get_full_report(ticker, max_tries, sleep):
     data = {}
 
-    # cadastro_data = get_cadastro_data(ticker, max_tries, sleep)
-    # cotacao_data = get_cotacao_data(ticker, max_tries, sleep)
-    # fundamentalista_data = get_fundamentalista_data(ticker, max_tries, sleep)
+    cadastro_data = get_cadastro_data(ticker, max_tries, sleep)
+    cotacao_data = get_cotacao_data(ticker, max_tries, sleep)
+    fundamentalista_data = get_fundamentalista_data(ticker, max_tries, sleep)
     noticia_data = get_noticias_data(ticker, max_tries, sleep)
 
-    # data["Dados de cadastro"] = cadastro_data
-    # data["Dados de cotação"] = cotacao_data
-    # data["Indicadores fundamentalistas"] = fundamentalista_data
+    data["Dados de cadastro"] = cadastro_data
+    data["Dados de cotação"] = cotacao_data
+    data["Indicadores fundamentalistas"] = fundamentalista_data
     data["Notícias"] = noticia_data
 
     return data
 
 
-if __name__ == "__main__":
-    print(get_full_report("recv3", 5, 0))
+# Exemplo
+# if __name__ == "__main__":
+#     print(get_full_report("recv3", 5, 0))
