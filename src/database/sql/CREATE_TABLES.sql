@@ -30,7 +30,7 @@ CREATE TABLE IndicadoresFundamentalistas (
     IDConsulta INT NOT NULL,
     DataConsulta DATE NOT NULL,
     Ticker VARCHAR(20) NOT NULL,
-    P/L DECIMAL(10, 2),
+    P_L DECIMAL(10, 2),
     ROE DECIMAL(10, 2),
     DividaLiquida/EBTIDA DECIMAL(10, 2),
     MargemLiquida DECIMAL(10, 2),
@@ -39,11 +39,14 @@ CREATE TABLE IndicadoresFundamentalistas (
     FOREIGN KEY (Ticker) REFERENCES Ativos(Ticker)
 );
 
-CREATE TABLE Clima (
+CREATE TABLE Noticias (
     IDConsulta INT NOT NULL,
     DataConsulta DATE NOT NULL,
     Ticker VARCHAR(20) NOT NULL,
-    Escala DECIMAL(5, 2),
-    PRIMARY KEY (IDConsulta),
+    URLNoticia VARCHAR(40) NOT NULL,
+    Resumo VARCHAR(500) NOT NULL,
+    Classificador VARCHAR(10) NOT NULL,
+    Escala DECIMAL(5, 2) NOT NULL,
+    PRIMARY KEY (IDConsulta, DataConsulta),
     FOREIGN KEY (Ticker) REFERENCES Ativos(Ticker)
 )

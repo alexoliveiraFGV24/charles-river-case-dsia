@@ -1,16 +1,27 @@
 import anthropic
 from  google import genai
+from weasyprint import HTML
 from dotenv import load_dotenv
 import os
 import json
-from weasyprint import HTML
+
 
 
 load_dotenv()
 
 
 
-def generate_ai_resume(ticker, text):
+def generate_ai_resume(ticker: str, text: str) -> str:
+    """
+    Gera um resumo de algum texto relacionado a um ticker utilizando o Gemini.
+
+    Args:
+        ticker: Código do ativo (ex: 'PETR4.SA', 'AAPL')
+        text: Texto referente ao ticker
+
+    Returns:
+        Texto resumido com pontos pertinentes ao ticker
+    """
 
     # Instancia o cliente
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -52,7 +63,19 @@ def generate_ai_resume(ticker, text):
 
 
 
-def generate_ai_news_report(ticker, link):
+def generate_ai_news_report(ticker: str, link: str) -> dict:
+
+    """
+    Gera um relatório completo de 5 notícias sobre o ticker com Gemini
+
+    Args:
+        ticker: Código do ativo (ex: 'PETR4.SA', 'AAPL')
+        Link da notícia
+
+    Returns:
+        Análise estruturada com o seguinte dicionário:
+        {"link", "resumo", "classificação": NEGATIVO, NEUTRO ou POSITIVO, "escala": -1 a 1}
+    """
 
     # Instancia o cliente
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -103,6 +126,18 @@ def generate_ai_news_report(ticker, link):
 
 
 def ai_translater(texto: str, idioma_destino: str = "protuguês brasileiro") -> str:
+
+    """
+    Traduz um texto para determinado idioma com Claude
+
+    Args:
+        Texto para ser traduzido
+        Idioma de tradução
+
+    Returns:
+        Texto traduzido
+    """
+
     client = anthropic.Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
 
     PROMPT = f"""
@@ -131,6 +166,17 @@ def ai_translater(texto: str, idioma_destino: str = "protuguês brasileiro") -> 
 
 
 def generate_ai_report(dados: dict) -> str:
+
+    """
+    Gera um relatório detalhado sobre dados de um ticker
+
+    Args:
+        Dicionário de dados com dados cadastrais, dados de cotação, indicadores fundamentalistas e resumo de notícias
+
+    Returns:
+        HTML com o relatório estruturado
+    """
+
     client = anthropic.Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
 
     PROMPT = f"""
@@ -206,5 +252,17 @@ def generate_ai_report(dados: dict) -> str:
 
 
 
-def pdf_report_saver(html: str, nome_arquivo: str):
+def pdf_report_saver(html: str, nome_arquivo: str) -> None:
+
+    """
+    Função que salva um HTML para um PDF
+
+    Args:
+        "Link" do HTML
+        Nome do arquivo que gostaria de salvar
+
+    Returns:
+        None
+    """
+
     HTML(string=html).write_pdf(nome_arquivo)

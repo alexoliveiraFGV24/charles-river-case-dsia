@@ -1,7 +1,7 @@
 import yfinance as yf
 from datetime import datetime
 
-from src.backend.scrapper_backup import get_news_data
+from backend.scrapper2 import get_news_data
 
 
 
@@ -42,7 +42,7 @@ def get_full_data(ticker: str) -> dict:
     except Exception:
         ultimo_balanco = None
     dados_cotacao = {
-        "ultima_cotacao":          info.get("currentPrice")    or info.get("regularMarketPrice"),
+        "cotacao":          info.get("currentPrice")    or info.get("regularMarketPrice"),
         "data_ultima_cotacao":     ultima_data,
         "minimo_52_semanas":       info.get("fiftyTwoWeekLow"),
         "maximo_52_semanas":       info.get("fiftyTwoWeekHigh"),

@@ -65,17 +65,20 @@ class IndicadoresFundamentalistas(Base):
     IDConsulta          = Column(Integer,       primary_key=True, autoincrement=True)
     DataConsulta        = Column(Date,          nullable=False)
     Ticker              = Column(String(20),    ForeignKey("Ativos.Ticker"), nullable=False)
-    PL                  = Column("P_L",         Numeric(10, 2))   # P/L renomeado (barra inválida em Python)
+    P_L                 = Column(Numeric(10, 2))
     ROE                 = Column(Numeric(10, 2))
     DividaLiquidaEBITDA = Column("DividaLiquida_EBITDA", Numeric(10, 2))
     MargemLiquida       = Column(Numeric(10, 2))
     DividendYield       = Column(Numeric(10, 2))
 
 
-class Clima(Base):
-    __tablename__ = "Clima"
+class Noticias(Base):
+    __tablename__ = "Noticias"
 
     IDConsulta   = Column(Integer,    primary_key=True, autoincrement=True)
-    DataConsulta = Column(Date,       nullable=False)
+    DataConsulta = Column(Date,       primary_key=True, nullable=False)
     Ticker       = Column(String(20), ForeignKey("Ativos.Ticker"), nullable=False)
+    URLNoticia   = Column(String(40), nullable=False)
+    Resumo       = Column(String(500), nullable=False)
+    Classificador= Column(String(10), nullable=False)
     Escala       = Column(Numeric(5, 2))

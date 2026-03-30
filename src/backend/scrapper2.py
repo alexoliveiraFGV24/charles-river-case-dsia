@@ -57,25 +57,25 @@ def get_register_data(ticker, max_tries, sleep):
 
     # Preenchendo os dados
     if nome:
-        data["Nome empresa"] = nome.text.strip()
+        data["nome_empresa"] = nome.text.strip()
     else:
-        data["Nome empresa"] = nao_encontrado
+        data["nome_empresa"] = nao_encontrado
 
     if setor_atuacao:
-        data["Setor de atuação"] = setor_atuacao.text.strip()
+        data["setor"] = setor_atuacao.text.strip()
     else:
-        data["Setor de atuação"] = nao_encontrado
+        data["setor"] = nao_encontrado
 
     if segmento_atuacao:
-        data["Segmento de atuação"] = segmento_atuacao.text.strip()
+        data["segmento"] = segmento_atuacao.text.strip()
     else:
-        data["Segmento de atuação"] = nao_encontrado
+        data["segmento"] = nao_encontrado
 
     if resumo_negocio:
         resumo_negocio = resumo_negocio.text.strip()
-        data["Resumo do negócio (IA)"] = generate_ai_resume(ticker, resumo_negocio) # Resumo com AI
+        data["resumo_negocio"] = generate_ai_resume(ticker, resumo_negocio) # Resumo com AI
     else:
-        data["Resumo do negócio (IA)"] = nao_encontrado
+        data["resumo_negocio"] = nao_encontrado
 
     # Retornando
     return data
@@ -120,7 +120,6 @@ def get_cotation_data(ticker, max_tries, sleep):
     volume_medio_negociacao_2_meses = dados_cotacao1[19].text.strip()
     valor_mercado = dados_cotacao2[1].text.strip()
     ult_balanco_process = dados_cotacao2[3].text.strip()
-    valor_firma = dados_cotacao2[5].text.strip()
     num_acoes = dados_cotacao2[7].text.strip()
 
     # Frase de não encontrado
@@ -128,49 +127,44 @@ def get_cotation_data(ticker, max_tries, sleep):
 
     # Preenchendo os dados
     if cotacao:
-        data["Cotação"] = parse_numero(cotacao)
+        data["cotacao"] = parse_numero(cotacao)
     else:
-        data["Cotação"] = nao_encontrado
+        data["cotacao"] = nao_encontrado
 
     if data_ultima_cotacao:
-        data["Data última cotação"] = parse_data(data_ultima_cotacao)
+        data["data_ultima_cotacao"] = parse_data(data_ultima_cotacao)
     else:
-        data["Data última cotação"] = nao_encontrado
+        data["data_ultima_cotacao"] = nao_encontrado
 
     if min_52_sem:
-        data["Mínimo 52 semanas"] = parse_numero(min_52_sem)
+        data["minimo_52_semanas"] = parse_numero(min_52_sem)
     else:
-        data["Mínimo 52 semanas"] = nao_encontrado
+        data["minimo_52_semanas"] = nao_encontrado
 
     if max_52_sem:
-        data["Máximo 52 semanas"] = parse_numero(max_52_sem)
+        data["maximo_52_semanas"] = parse_numero(max_52_sem)
     else:
-        data["Máximo 52 semanas"] = nao_encontrado
+        data["maximo_52_semanas"] = nao_encontrado
 
     if volume_medio_negociacao_2_meses:
-        data["Volume médio de negociação (2 meses)"] = parse_numero(volume_medio_negociacao_2_meses)
+        data["volume_medio_2_meses"] = parse_numero(volume_medio_negociacao_2_meses)
     else:
-        data["Volume médio de negociação (2 meses)"] = nao_encontrado
+        data["volume_medio_2_meses"] = nao_encontrado
     
     if valor_mercado:
-        data["Valor de mercado"] = parse_numero(valor_mercado)
+        data["valor_de_mercado"] = parse_numero(valor_mercado)
     else:
-        data["Valor de mercado"] = nao_encontrado
-
-    if valor_firma:
-        data["valor da firma"] = parse_numero(valor_firma)
-    else:
-        data["valor da firma"] = nao_encontrado
+        data["valor_de_mercado"] = nao_encontrado
 
     if ult_balanco_process:
-        data["Último balanço processado"] = parse_data(ult_balanco_process)
+        data["data_ultimo_balanco"] = parse_data(ult_balanco_process)
     else:
-        data["Último balanço processado"] = nao_encontrado
+        data["data_ultimo_balanco"] = nao_encontrado
 
     if num_acoes:
-        data["Número de ações"] = parse_numero(num_acoes)
+        data["numero_de_acoes"] = parse_numero(num_acoes)
     else:
-        data["Número de ações"] = nao_encontrado
+        data["numero_de_acoes"] = nao_encontrado
     
     # Retornando
     return data
@@ -216,29 +210,29 @@ def get_fundamentalist_data(ticker, max_tries, sleep):
 
     # Preenchendo os dados
     if p_por_l:
-        data["P/L"] = parse_numero(p_por_l)
+        data["p_l"] = parse_numero(p_por_l)
     else:
-        data["P/L"] = nao_encontrado
+        data["p_l"] = nao_encontrado
 
     if roe:
-        data["ROE (%)"] = parse_numero(roe)/100
+        data["roe"] = parse_numero(roe)/100
     else:
-        data["ROE (%)"] = nao_encontrado
+        data["roe"] = nao_encontrado
 
     if divida_liquida_por_ebitda:
-        data["Dívida Líquida/EBTIDA"] = parse_numero(divida_liquida_por_ebitda)
+        data["divida_liquida_ebtida"] = parse_numero(divida_liquida_por_ebitda)
     else:
-        data["Dívida Líquida/EBTIDA"] = nao_encontrado
+        data["divida_liquida_ebtida"] = nao_encontrado
 
     if margem_liquida:
-        data["Margem Líquida (%)"] = parse_numero(margem_liquida)/100
+        data["margem_liquida"] = parse_numero(margem_liquida)/100
     else:
-        data["Margem Líquida (%)"] = nao_encontrado
+        data["margem_liquida"] = nao_encontrado
 
     if dividend_yield:
-        data["Dividend Yield (%)"] = parse_numero(dividend_yield)/100
+        data["dividend_yield"] = parse_numero(dividend_yield)/100
     else:
-        data["Dividend Yield (%)"] = nao_encontrado
+        data["dividend_yield"] = nao_encontrado
 
     # Retornando
     return data
@@ -276,18 +270,18 @@ def get_news_data(ticker, max_tries, sleep):
     # Fazendo um resumo e classificando cada uma delas
     for i in range(1):
         if noticias[i]["storyPath"]:
-            url_noticia = "https://br.tradingview.com" + todas_noticias[i]["storyPath"]
-            resumo, classificador = generate_ai_news_report(ticker, url_noticia)
-            data[f"Notícia {i+1}"] = (url_noticia, resumo, classificador)
+            url_noticia = "https://br.tradingview.com" + noticias[i]["storyPath"]
+            _, resumo, classificador, escala = generate_ai_news_report(ticker, url_noticia)
+            data[f"noticia_{i+1}"] = [url_noticia, resumo, classificador, escala]
         else:
-            data[f"Notícia {i+1}"] = "Não encontrado(a)"
+            data[f"noticia_{i+1}"] = "Não encontrado(a)"
 
     # Retornando
     return data
 
 
 # Gerando todos os dados
-def get_full_report(ticker, max_tries, sleep):
+def get_full_data(ticker, max_tries, sleep):
     data = {}
 
     cadastro_data = get_register_data(ticker, max_tries, sleep)
@@ -295,14 +289,16 @@ def get_full_report(ticker, max_tries, sleep):
     fundamentalista_data = get_fundamentalist_data(ticker, max_tries, sleep)
     noticia_data = get_news_data(ticker, max_tries, sleep)
 
-    data["Dados de cadastro"] = cadastro_data
-    data["Dados de cotação"] = cotacao_data
-    data["Indicadores fundamentalistas"] = fundamentalista_data
-    data["Notícias"] = noticia_data
+    data["ticker"] = ticker.upper()
+    data["data_coleta"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data["dados_cadastrais"] = cadastro_data
+    data["dados_cotacao"] = cotacao_data
+    data["indicadores_fundamentalistas"] = fundamentalista_data
+    data["noticias"] = noticia_data
 
     return data
 
 
 # Exemplo
 # if __name__ == "__main__":
-#     print(get_full_report("recv3", 5, 0))
+#     print(get_full_data("recv3", 5, 0))

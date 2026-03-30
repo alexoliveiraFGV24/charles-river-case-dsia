@@ -1,21 +1,28 @@
-from datetime import date
-
+from dotenv import load_dotenv
 from src.database import *
-from src.backend.scrapper import get_full_data
+import backend.scrapper1 as s1
+import backend.scrapper2 as s2
 
 
-def _ativo_existe(session: Session, ticker: str) -> bool:
+
+load_dotenv()
+
+
+
+def _existing_ticker(session: Session, ticker: str) -> bool:
     return session.get(Ativo, ticker) is not None
 
 
-def inserir_dados(session: Session, ticker: str, dados: dict, escala_clima: float | None = None) -> None:
-    hoje = date.today()
-    c    = dados["cadastral"]
-    q    = dados["cotacao"]
-    i    = dados["indicadores"]
 
-    # ── Ativos (upsert simples: só insere se ainda não existir) ──────────────
-    if not _ativo_existe(session, ticker.upper()):
+def insert_data(session: Session, ticker: str, dados: dict) -> None:
+    hoje = dados["data_coleta"]
+    c    = dados["dados_cadastrais"]
+    q    = dados["dados_cotacao"]
+    i    = dados["indicadores_fundamentalistas"]
+    n    = dados["noticias"]
+
+    # Ativos (upsert simples: só insere se ainda não existir)
+    if not _existing_ticker(session, ticker.upper()):
         session.add(Ativo(
             Ticker                 = c["ticker"],
             EmpresaAtivo           = c["empresa"],
@@ -25,7 +32,7 @@ def inserir_dados(session: Session, ticker: str, dados: dict, escala_clima: floa
         ))
         session.flush()   # garante FK antes das próximas inserções
 
-    # ── DadosCotacao ─────────────────────────────────────────────────────────
+    # DadosCotacao
     session.add(DadosCotacao(
         DataConsulta        = hoje,
         Ticker              = c["ticker"],
@@ -39,7 +46,7 @@ def inserir_dados(session: Session, ticker: str, dados: dict, escala_clima: floa
         DataUltimoBalanco   = q["data_ultimo_balanco"],
     ))
 
-    # ── IndicadoresFundamentalistas ──────────────────────────────────────────
+    # IndicadoresFundamentalistas
     session.add(IndicadoresFundamentalistas(
         DataConsulta        = hoje,
         Ticker              = c["ticker"],
@@ -50,12 +57,17 @@ def inserir_dados(session: Session, ticker: str, dados: dict, escala_clima: floa
         DividendYield       = i["dividend_yield"],
     ))
 
-    # ── Clima ────────────────────────────────────────────────────────────────
-    session.add(Clima(
-        DataConsulta = hoje,
-        Ticker       = c["ticker"],
-        Escala       = escala_clima,
-    ))
+    # Noticias
+    for i in range(5):
+        session.add(Noticias(
+            DataConsulta = hoje,
+            Ticker       = c["ticker"],
+            URLNoticia   = n[f"noticia_{i+1}"][0],
+            Resumo       = n[f"noticia_{i+1}"][1],
+            Classificador= n[f"noticia_{i+1}"][2],
+            Escala       = n[f"noticia_{i+1}"][3],
+        ))
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -63,29 +75,30 @@ def inserir_dados(session: Session, ticker: str, dados: dict, escala_clima: floa
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main():
+
     # Cria as tabelas caso ainda não existam
     Base.metadata.create_all(engine)
     print("Tabelas verificadas/criadas.\n")
 
-    tickers = ["PETR4.SA", "VALE3.SA"]
-
     with Session(engine) as session:
-        for ticker in tickers:
+        for ticker in os.getenv("TICKERS"):
             print(f"Coletando {ticker}...")
             try:
-                dados = get_full_data(ticker)
-                inserir_dados(
-                    session,
-                    ticker,
-                    dados,
-                    escala_clima=None,   # preencha com o valor desejado
-                )
+
+                # Tenta algum dos dois métodos de obtenção dos dados
+                if s1.get_full_data(ticker) != {}:
+                    dados = s1.get_full_data(ticker)
+                else:
+                    dados = s2.get_full_data(ticker, os.getenv("MAX_TRIES"), os.getenv("SLEEP"))
+                
+                # Inserindo os dados
+                insert_data(session, ticker,dados)
                 print(f"{ticker} inserido.")
             except Exception as e:
                 print(f"Erro em {ticker}: {e}")
 
         session.commit()
-        print("\nCommit realizado")
+        print("\nCommit realizado. Transação finalizada!")
 
 
 # Exemplo
