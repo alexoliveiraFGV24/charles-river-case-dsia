@@ -282,6 +282,17 @@ def get_news_data(ticker, max_tries, sleep):
 
 # Gerando todos os dados
 def get_full_data(ticker, max_tries, sleep):
+
+    """
+    Coleta dados cadastrais, de cotação e fundamentalistas de uma ação via yfinance.
+
+    Args:
+        ticker: Código do ativo (ex: 'PETR4.SA', 'AAPL')
+
+    Returns:
+        Dicionário com todas as informações coletadas.
+    """
+        
     data = {}
 
     cadastro_data = get_register_data(ticker, max_tries, sleep)
