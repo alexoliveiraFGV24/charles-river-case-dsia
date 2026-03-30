@@ -22,7 +22,7 @@ Para a *IDE*, utilizei o *Virtual Studio Code* (https://code.visualstudio.com/do
 
 Como linguagem de programação optei por usar Python, além de um pouco de SQL para estruturar o banco de dados com a biblioteca *sqlalchemy*.
 
-Para a parte da coleta de dados, usei a biblioteca Python *yfinance* e os sites *Status Invest, Investidor 10, B3, Trading View* e *Fundamentus*.
+Para a parte da coleta de dados, usei as bibliotecas Python *yfinance* e *bs4* (*BeatifulSoup*) e os sites *Status Invest, Investidor 10, B3, Trading View* e *Fundamentus*.
 
 Para a parte de síntese de dados e geração do relatório, usei as APIS das LLMs Gemini (https://ai.google.dev/gemini-api/docs/api-key) e Claude (https://platform.claude.com/settings/keys). Lembrando que, para usar indeterminadamente, haverá cobrança para com os tokens de cada LLM.
 
