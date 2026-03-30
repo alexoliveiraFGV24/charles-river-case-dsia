@@ -24,7 +24,7 @@ Como linguagem de programação optei por usar Python, além de um pouco de SQL 
 
 Para a parte da coleta de dados, usei a biblioteca Python *yfinance* e os sites *Status Invest, Investidor 10, B3, Trading View* e *Fundamentus*.
 
-Para a parte de síntese de dados e geração do relatório, usei as APIS das LLMs Gemini (https://ai.google.dev/gemini-api/docs/api-key) e Claude (https://platform.claude.com/settings/keys).
+Para a parte de síntese de dados e geração do relatório, usei as APIS das LLMs Gemini (https://ai.google.dev/gemini-api/docs/api-key) e Claude (https://platform.claude.com/settings/keys). Lembrando que, para usar indeterminadamente, haverá cobrança para com os tokens de cada LLM.
 
 Para o dashboard, utilizei as bibliotecas Python *streamlit*, *matplotlib* e *seaborn*.
 
@@ -90,9 +90,12 @@ Execute o passo a passo no terminal Git Bash:
 
 ```bash
 # Instalação (usando pacman) com configuração de senha root e segurança básica
-sudo apt update && sudo apt install mysql-server -y
+sudo pacman -Syu
+sudo pacman -S mysql # Instale com o MariaDB
+sudo systemctl status mysql
 sudo systemctl start mysql
-sudo mysql_secure_installation
+sudo systemctl enable mysql
+sudo mysql_secure_installation # Atualize a senha para OWNER_PASSWORD do .env
 
 # Criando o banco
 # O usuário e a senha estão no .env
@@ -101,6 +104,10 @@ CREATE DATABASE IF NOT EXISTS HipoteseCapital CHARACTER SET utf8mb4 COLLATE utf8
 CREATE USER 'seu_usuario'@'localhost' IDENTIFIED BY 'sua_senha';
 GRANT ALL PRIVILEGES ON HipoteseCapital.* TO 'seu_usuario'@'localhost';
 FLUSH PRIVILEGES;
+SHOW DATABASES; # Ver se HipoteseCApital foi criada
+USE HipoteseCApital # Acessar a database
+# Crie as tabelas assim como no arquivo src/database/sql/CREATE_TABLES.sql
+
 ```
 
 Ou vá em https://dev.mysql.com/downloads/installer/ para instalar no Windows.
@@ -112,3 +119,5 @@ streamlit run main.py
 ```
 
 Você deverá ver algo como na imagem:
+
+<img src="public/dashboard.png" width="600" alt="Dashboard" />

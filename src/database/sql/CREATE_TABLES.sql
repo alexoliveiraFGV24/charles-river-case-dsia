@@ -32,7 +32,7 @@ CREATE TABLE IndicadoresFundamentalistas (
     Ticker VARCHAR(20) NOT NULL,
     P_L DECIMAL(10, 2),
     ROE DECIMAL(10, 2),
-    DividaLiquida/EBTIDA DECIMAL(10, 2),
+    DividaLiquida_EBTIDA DECIMAL(10, 2),
     MargemLiquida DECIMAL(10, 2),
     DividendYield DECIMAL(10, 2),
     PRIMARY KEY (IDConsulta),

@@ -250,6 +250,37 @@ def generate_dashboard_report():
             st.cache_data.clear()
             st.rerun()
 
+    if not all_tickers:
+        st.info("Nenhum ticker cadastrado ainda. Cadastre um abaixo para começar.")
+
+        with st.form("form_cadastro"):
+            novo_ticker = st.text_input("Ticker", placeholder="Ex: PETR4.SA, VALE3.SA, AAPL").strip().upper()
+            submitted = st.form_submit_button("➕ Cadastrar e coletar dados")
+
+        if submitted:
+            if not novo_ticker:
+                st.warning("Digite um ticker válido.")
+            else:
+                with st.spinner(f"Coletando dados de {novo_ticker}..."):
+                    try:
+                        from src.database import Base
+                        from src.database.database import insert_data
+                        Base.metadata.create_all(engine)
+
+                        dados = s1.get_full_data(novo_ticker)
+                        if not dados:
+                            st.error("Ticker não encontrado ou sem dados disponíveis.")
+                        else:
+                            with Session(engine) as session:
+                                insert_data(session, novo_ticker, dados)
+                                session.commit()
+                            st.success(f"✅ {novo_ticker} cadastrado com sucesso! Recarregue a página.")
+                            st.cache_data.clear()
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao cadastrar {novo_ticker}: {e}")
+        st.stop()
+
     if not sel_tickers:
         st.warning("Selecione ao menos um ticker na barra lateral.")
         st.stop()

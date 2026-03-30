@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from src.database import *
-import backend.scrapper1 as s1
-import backend.scrapper2 as s2
+import src.backend.scrapper1 as s1
+import src.backend.scrapper2 as s2
 
 
 
