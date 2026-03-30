@@ -1,7 +1,7 @@
 import yfinance as yf
 from datetime import datetime
 
-from backend.scrapper2 import get_news_data
+from src.backend.scrapper2 import get_news_data
 
 
 

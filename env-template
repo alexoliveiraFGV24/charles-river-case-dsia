@@ -12,7 +12,5 @@ CLAUDE_API_KEY = "sua_chave_api"
 # Configuração para o banco de dados
 USERNAME = "seu_usuario"
 PASSWORD = "sua_senha"
-HOST = "localhost"
-PORT = 3306     
-DATABASE = "HipoteseCapital"
 OWNER = "admin"
+OWNER_PASSWORD = "senha_forte_123"

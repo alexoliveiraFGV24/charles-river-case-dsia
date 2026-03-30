@@ -42,8 +42,7 @@ Para o dashboard, utilizei as bibliotecas Python *streamlit*, *matplotlib* e *se
 |--|--|--scrapper1.py           # Módulo que utiliza a biblioteca yfinance
 |--|--|--scrapper2.py           # Módulo que utiliza de webscrapping
 |--|--dashboard                 # Pasta que guarda as operações do dashboard e do relatório
-|--|--|--generate_dashboard.py  # Módulo que cria o dashboard interativo
-|--|--|--generate_report.py     # Módulo que cria o relatório profissional completo
+|--|--|--generate_report.py     # Módulo que cria o dashboard interativo junto com o relatório
 |--|--database                  # Pasta que guarda as operações do banco de dados
 |--|--|--sql                    # Pasta que guarda os arquivos de modelagem SQL
 |--|--|--|--CREATE_TABLES.sql   # 
@@ -85,11 +84,31 @@ Depois de realizado o passo a passo, altere o .env seguindo o passo a passo do a
 Para obter as chaves API necessárias, vá em **Ferramentas**.
 
 
+## Criando o banco de dados
+
+Execute o passo a passo no terminal Git Bash:
+
+```bash
+# Instalação (usando pacman) com configuração de senha root e segurança básica
+sudo apt update && sudo apt install mysql-server -y
+sudo systemctl start mysql
+sudo mysql_secure_installation
+
+# Criando o banco
+# O usuário e a senha estão no .env
+sudo mysql -u root -p
+CREATE DATABASE IF NOT EXISTS HipoteseCapital CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'seu_usuario'@'localhost' IDENTIFIED BY 'sua_senha';
+GRANT ALL PRIVILEGES ON HipoteseCapital.* TO 'seu_usuario'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Ou vá em https://dev.mysql.com/downloads/installer/ para instalar no Windows.
+
+
 ## Execuntando o projeto
 ```bash
-python main.py # Linux
-ou
-python3 main.py # Windows
+streamlit run main.py
 ```
 
 Você deverá ver algo como na imagem:

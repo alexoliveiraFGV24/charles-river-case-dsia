@@ -11,9 +11,9 @@ load_dotenv()
 DB_CONFIG = {
     "username": os.getenv("USERNAME"),
     "password": os.getenv("PASSWORD"),
-    "host": os.getenv("HOST"),
-    "port": os.getenv("PORT"),         
-    "database": os.getenv("DATABASE"),
+    "host": "localhost",
+    "port": 3306,         
+    "database": "HipoteseCapital",
     "owner": os.getenv("OWNER"), 
 }
 
